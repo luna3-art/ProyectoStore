@@ -34,12 +34,13 @@ public class PanelInicio extends javax.swing.JPanel {
         jLabel4 = new javax.swing.JLabel();
         cardVentas = new javax.swing.JPanel();
         jLabel5 = new javax.swing.JLabel();
+        jLabelFecha = new javax.swing.JLabel();
         jPanelActividad = new javax.swing.JPanel();
         jLabelAR = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         txtAactividadReciente = new javax.swing.JTextArea();
-        jLabelFecha = new javax.swing.JLabel();
 
+        setMinimumSize(new java.awt.Dimension(1067, 306));
         setName("panelInicio"); // NOI18N
         setPreferredSize(new java.awt.Dimension(1067, 306));
         setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -73,10 +74,10 @@ public class PanelInicio extends javax.swing.JPanel {
             cardClientesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(cardClientesLayout.createSequentialGroup()
                 .addComponent(jLabel3)
-                .addGap(0, 42, Short.MAX_VALUE))
+                .addGap(0, 82, Short.MAX_VALUE))
         );
 
-        add(cardClientes, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 80, 100, 60));
+        add(cardClientes, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 80, 100, 100));
 
         cardProductos.setBackground(new java.awt.Color(255, 255, 255));
         cardProductos.setBorder(javax.swing.BorderFactory.createEtchedBorder(java.awt.Color.lightGray, java.awt.Color.darkGray));
@@ -100,10 +101,10 @@ public class PanelInicio extends javax.swing.JPanel {
             cardProductosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(cardProductosLayout.createSequentialGroup()
                 .addComponent(jLabel4)
-                .addGap(0, 42, Short.MAX_VALUE))
+                .addGap(0, 82, Short.MAX_VALUE))
         );
 
-        add(cardProductos, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 80, -1, 60));
+        add(cardProductos, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 80, -1, 100));
 
         cardVentas.setBackground(new java.awt.Color(255, 255, 255));
         cardVentas.setBorder(javax.swing.BorderFactory.createEtchedBorder(java.awt.Color.lightGray, java.awt.Color.darkGray));
@@ -126,10 +127,14 @@ public class PanelInicio extends javax.swing.JPanel {
             cardVentasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(cardVentasLayout.createSequentialGroup()
                 .addComponent(jLabel5)
-                .addGap(0, 42, Short.MAX_VALUE))
+                .addGap(0, 82, Short.MAX_VALUE))
         );
 
-        add(cardVentas, new org.netbeans.lib.awtextra.AbsoluteConstraints(300, 80, 90, 60));
+        add(cardVentas, new org.netbeans.lib.awtextra.AbsoluteConstraints(300, 80, 90, 100));
+
+        jLabelFecha.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+        jLabelFecha.setText("Fecha: 18/05/2026");
+        add(jLabelFecha, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 410, 112, -1));
 
         jPanelActividad.setName("panelActividad"); // NOI18N
 
@@ -148,14 +153,11 @@ public class PanelInicio extends javax.swing.JPanel {
         jPanelActividadLayout.setHorizontalGroup(
             jPanelActividadLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanelActividadLayout.createSequentialGroup()
+                .addGap(18, 18, 18)
                 .addGroup(jPanelActividadLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanelActividadLayout.createSequentialGroup()
-                        .addGap(18, 18, 18)
-                        .addComponent(jLabelAR, javax.swing.GroupLayout.PREFERRED_SIZE, 112, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jPanelActividadLayout.createSequentialGroup()
-                        .addGap(24, 24, 24)
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 358, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(18, Short.MAX_VALUE))
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 358, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabelAR, javax.swing.GroupLayout.PREFERRED_SIZE, 112, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(24, Short.MAX_VALUE))
         );
         jPanelActividadLayout.setVerticalGroup(
             jPanelActividadLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -163,15 +165,11 @@ public class PanelInicio extends javax.swing.JPanel {
                 .addContainerGap()
                 .addComponent(jLabelAR)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 84, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(24, Short.MAX_VALUE))
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(18, Short.MAX_VALUE))
         );
 
-        add(jPanelActividad, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 158, 400, 140));
-
-        jLabelFecha.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
-        jLabelFecha.setText("Fecha: 18/05/2026");
-        add(jLabelFecha, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 300, 112, -1));
+        add(jPanelActividad, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 210, 400, 180));
     }// </editor-fold>//GEN-END:initComponents
 
 

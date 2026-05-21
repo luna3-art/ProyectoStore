@@ -139,7 +139,7 @@ public class FrmLogin extends javax.swing.JFrame {
         // Validamos los datos recogidos con el método
         if(cLogin.validar(txtUser.getText(), txtPassword.getText())){
             // Instanciamos el Login
-            JFrameMenu menu = new JFrameMenu();
+            FrmMenu menu = new FrmMenu();
             
             // De cumplirse entonces procede (!referenciaremos proximmamente)
             menu.setVisible(true);
