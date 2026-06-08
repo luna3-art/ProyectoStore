@@ -4,24 +4,59 @@
  */
 package vista2;
 
-import Modelo.Producto;
-import javax.swing.table.DefaultTableModel;
-import Estructuras.ListaEnlazada.ListaEnlazada.Nodo;
+
+import Controladores.ControlProducto;
+import Estructuras.Nodo;
 import Modelo.Producto;
 import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
-import servicios.DatosSistema;
+import javax.swing.table.DefaultTableModel;
+
 
 public class panelProductos extends javax.swing.JPanel {
 
     /**
      * Creates new form panelProductos
      */
+    
+    private ControlProducto controlador;
+    
     public panelProductos() {
         initComponents();
-        
+        controlador = new ControlProducto();
+        cargarTabla();
     }
+    
+    private void cargarTabla(){
+        DefaultTableModel modelo = (DefaultTableModel) tblProductos.getModel();
+
+        modelo.setRowCount(0);
+
+        Nodo<Producto> aux =
+                controlador.getProductos().getCabeza();
+
+        while (aux != null) {
+
+            Producto p = aux.getDato();
+
+            modelo.addRow(new Object[]{
+                p.getCodigo(),
+                p.getNombre(),
+                p.getCategoria(),
+                p.getPrecio(),
+                p.getStock()
+            });
+
+            aux = aux.getSiguiente();
+        }
+
+        lblTotalProductos.setText(
+                "Total de productos: "
+                + controlador.getProductos().tamaño()
+        );
+    }
+    
     
 
     /**
@@ -236,27 +271,113 @@ public class panelProductos extends javax.swing.JPanel {
 
     //METODO AGREGAR PRODUCTO
     private void mostrarDialogoNuevoProducto() {
-        JTextField txtCod  = new JTextField(); JTextField txtNom = new JTextField();
-        JTextField txtPre  = new JTextField(); JTextField txtSto = new JTextField();
+
+        JTextField txtCod = new JTextField();
+        JTextField txtNom = new JTextField();
+        JTextField txtPre = new JTextField();
+        JTextField txtSto = new JTextField();
+
         String[] cats = {"Polos", "Shorts", "Casacas", "Buzos", "Accesorios"};
         JComboBox<String> cmbCat = new JComboBox<>(cats);
-        Object[] campos = {"Código:", txtCod, "Nombre:", txtNom, "Categoría:", cmbCat, "Precio:", txtPre, "Stock:", txtSto};
-        int r = JOptionPane.showConfirmDialog(this, campos, "Nuevo Producto", JOptionPane.OK_CANCEL_OPTION);
+
+        Object[] campos = {
+            "Código:", txtCod,
+            "Nombre:", txtNom,
+            "Categoría:", cmbCat,
+            "Precio:", txtPre,
+            "Stock:", txtSto
+        };
+
+        int r = JOptionPane.showConfirmDialog(
+            this,
+            campos,
+            "Nuevo Producto",
+            JOptionPane.OK_CANCEL_OPTION
+        );
+
         if (r == JOptionPane.OK_OPTION) {
+
             try {
-                boolean ok = controlador.agregarProducto(
-                    txtCod.getText().trim(), txtNom.getText().trim(),
+
+                Producto producto = new Producto(
+                    txtCod.getText().trim(),
+                    txtNom.getText().trim(),
                     (String) cmbCat.getSelectedItem(),
                     Double.parseDouble(txtPre.getText().trim()),
-                    Integer.parseInt(txtSto.getText().trim()));
-                if (ok) { cargarDatos(); JOptionPane.showMessageDialog(this, "Producto agregado."); }
-                else JOptionPane.showMessageDialog(this, "El codigo ya existe.");
+                    Integer.parseInt(txtSto.getText().trim())
+                );
+
+                controlador.agregarProducto(producto);
+
+                cargarTabla();
+
+                JOptionPane.showMessageDialog(
+                    this,
+                    "Producto agregado correctamente."
+                );
+
             } catch (NumberFormatException ex) {
-                JOptionPane.showMessageDialog(this, "Precio y stock deben ser numericos.");
+
+                JOptionPane.showMessageDialog(
+                    this,
+                    "Precio y stock deben ser numéricos."
+                );
             }
         }
     }
+    
+    
+    public class panelProductos extends javax.swing.JPanel {
 
+    private ControlProducto controlador;
+
+    public panelProductos() {
+        initComponents();
+
+        controlador = new ControlProducto();
+
+        cargarTabla();
+    }
+
+    private void cargarTabla() {
+
+        DefaultTableModel modelo = (DefaultTableModel) tblProductos.getModel();
+
+        modelo.setRowCount(0);
+
+        Nodo<Producto> aux = controlador.getProductos().getCabeza();
+
+        while (aux != null) {
+
+            Producto p = aux.getDato();
+
+            modelo.addRow(new Object[]{
+                p.getCodigo(),
+                p.getNombre(),
+                p.getCategoria(),
+                p.getPrecio(),
+                p.getStock()
+            });
+
+                aux = aux.getSiguiente();
+        }
+
+            lblTotalProductos.setText(
+                "Total de productos: "
+                + controlador.getProductos().tamaño()
+            );
+        }
+
+    }
+    
+    
+    
+    
+    
+    
+    
+
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnEditar;
     private javax.swing.JButton btnEliminar;

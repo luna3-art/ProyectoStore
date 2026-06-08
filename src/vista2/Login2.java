@@ -4,7 +4,7 @@
  */
 package vista2;
 
-import Controlador.ControlLogin;
+import Controladores.ControlLogin;
 import javax.swing.JOptionPane;
 
 /**
