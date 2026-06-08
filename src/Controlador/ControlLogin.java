@@ -14,7 +14,7 @@ public class ControlLogin {
     
     // Método para validar usuario
     public boolean validar(String usuario, String password){
-        return usuario.equals("admin")
+        return usuario.equals("admi")
             && password.equals("123");
     }
 }

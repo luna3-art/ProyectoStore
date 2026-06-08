@@ -4,15 +4,11 @@
  */
 package Modelo;
 
-/**
- *
- * @author Luna
- */
 
 // Encapsulamiento
 public class Usuario {
     
-    // Crear variables
+    // Crear atributos
     private String usuario;
     private String password;
     
@@ -31,5 +27,14 @@ public class Usuario {
         return password;
     }
     
-    
+    // Métodos set
+
+    public void setUsuario(String usuario) {
+        this.usuario = usuario;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+        
 }
