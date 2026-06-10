@@ -8,6 +8,7 @@ package vista2;
 import Controladores.ControlProducto;
 import Estructuras.Nodo;
 import Modelo.Producto;
+import javax.security.auth.callback.TextOutputCallback;
 import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
@@ -25,7 +26,7 @@ public class panelProductos extends javax.swing.JPanel {
     public panelProductos() {
         initComponents();
         controlador = new ControlProducto();
-        cargarTabla();
+        cargarTabla();              
     }
     
     private void cargarTabla(){
@@ -33,12 +34,11 @@ public class panelProductos extends javax.swing.JPanel {
 
         modelo.setRowCount(0);
 
-        Nodo<Producto> aux =
-                controlador.getProductos().getCabeza();
+        Nodo<Producto> temp = controlador.getProductos().getCabeza();
 
-        while (aux != null) {
+        while (temp != null) {
 
-            Producto p = aux.getDato();
+            Producto p = temp.getDato();
 
             modelo.addRow(new Object[]{
                 p.getCodigo(),
@@ -48,16 +48,76 @@ public class panelProductos extends javax.swing.JPanel {
                 p.getStock()
             });
 
-            aux = aux.getSiguiente();
+            temp = temp.getSiguiente();
         }
 
         lblTotalProductos.setText(
-                "Total de productos: "
-                + controlador.getProductos().tamaño()
+                "Total de productos: "+ controlador.getProductos().tamaño()
         );
     }
     
+    //BUSCAR POR NOMBRE O CODIGO
+    private void buscarProducto() {
+        
+        String texto = txtBuscar.getText().trim();
+        
+        if (texto.isEmpty()) {
+            cargarTabla();
+        return;
+        }
+        
+        DefaultTableModel modelo = (DefaultTableModel) tblProductos.getModel();
+
+        modelo.setRowCount(0);
+
+        Nodo<Producto> temp = controlador.buscarProductos(texto).getCabeza();
+
+        while (temp != null) {
+        Producto p = temp.getDato();
+
+            modelo.addRow(new Object[]{
+                p.getCodigo(),
+                p.getNombre(),
+                p.getCategoria(),
+                p.getPrecio(),
+                p.getStock()
+            });
+
+            temp = temp.getSiguiente();
+        }
+    }
     
+    //FILTRAR POR CATEGORIA
+    private void filtrarPorCategoria() {
+
+        String categoria = cmbCategoria.getSelectedItem().toString();
+
+        DefaultTableModel modelo = (DefaultTableModel) tblProductos.getModel();
+
+        modelo.setRowCount(0);
+
+        Nodo<Producto> temp = controlador.getProductos().getCabeza();
+
+        while (temp != null) {
+
+        Producto p = temp.getDato();
+
+        if (categoria.equals("Todas")
+                || p.getCategoria().equalsIgnoreCase(categoria)) {
+
+            modelo.addRow(new Object[]{
+                p.getCodigo(),
+                p.getNombre(),
+                p.getCategoria(),
+                p.getPrecio(),
+                p.getStock()
+            });
+        }
+
+        temp = temp.getSiguiente();
+        }
+    }
+      
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -81,6 +141,7 @@ public class panelProductos extends javax.swing.JPanel {
         btnEliminar = new javax.swing.JButton();
         btnEditar = new javax.swing.JButton();
         lblTotalProductos = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
 
         lblSubtitulo.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
         lblSubtitulo.setForeground(new java.awt.Color(17, 24, 39));
@@ -120,10 +181,20 @@ public class panelProductos extends javax.swing.JPanel {
 
         txtBuscar.setBackground(new java.awt.Color(255, 255, 255));
         txtBuscar.setForeground(new java.awt.Color(153, 153, 153));
-        txtBuscar.setText("   🔍 Buscar producto. . .");
+        txtBuscar.setText("   ");
         txtBuscar.setAlignmentX(20.0F);
         txtBuscar.setAlignmentY(20.0F);
         txtBuscar.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(153, 153, 153)));
+        txtBuscar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtBuscarActionPerformed(evt);
+            }
+        });
+        txtBuscar.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                txtBuscarKeyReleased(evt);
+            }
+        });
 
         jLabel1.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         jLabel1.setForeground(new java.awt.Color(0, 0, 0));
@@ -136,6 +207,11 @@ public class panelProductos extends javax.swing.JPanel {
         cmbCategoria.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Todas", "Polos", "Shorts", "Casacas", "Buzos", "Accesorios" }));
         cmbCategoria.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(153, 153, 153)));
         cmbCategoria.setPreferredSize(new java.awt.Dimension(100, 35));
+        cmbCategoria.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cmbCategoriaActionPerformed(evt);
+            }
+        });
 
         jScrollPane1.setBackground(new java.awt.Color(255, 255, 255));
         jScrollPane1.setForeground(new java.awt.Color(0, 0, 0));
@@ -164,6 +240,13 @@ public class panelProductos extends javax.swing.JPanel {
         });
         tblProductos.setPreferredSize(new java.awt.Dimension(850, 320));
         jScrollPane1.setViewportView(tblProductos);
+        if (tblProductos.getColumnModel().getColumnCount() > 0) {
+            tblProductos.getColumnModel().getColumn(0).setResizable(false);
+            tblProductos.getColumnModel().getColumn(1).setResizable(false);
+            tblProductos.getColumnModel().getColumn(2).setResizable(false);
+            tblProductos.getColumnModel().getColumn(3).setResizable(false);
+            tblProductos.getColumnModel().getColumn(4).setResizable(false);
+        }
 
         btnEliminar.setBackground(new java.awt.Color(0, 0, 0));
         btnEliminar.setFont(new java.awt.Font("Segoe UI Emoji", 1, 14)); // NOI18N
@@ -172,6 +255,11 @@ public class panelProductos extends javax.swing.JPanel {
         btnEliminar.setAlignmentX(780.0F);
         btnEliminar.setAlignmentY(35.0F);
         btnEliminar.setPreferredSize(new java.awt.Dimension(120, 40));
+        btnEliminar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnEliminarActionPerformed(evt);
+            }
+        });
 
         btnEditar.setBackground(new java.awt.Color(0, 0, 0));
         btnEditar.setFont(new java.awt.Font("Segoe UI Emoji", 1, 14)); // NOI18N
@@ -180,10 +268,18 @@ public class panelProductos extends javax.swing.JPanel {
         btnEditar.setAlignmentX(780.0F);
         btnEditar.setAlignmentY(35.0F);
         btnEditar.setPreferredSize(new java.awt.Dimension(120, 40));
+        btnEditar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnEditarActionPerformed(evt);
+            }
+        });
 
         lblTotalProductos.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         lblTotalProductos.setForeground(new java.awt.Color(0, 0, 0));
         lblTotalProductos.setText("Total de productos: 0");
+
+        jLabel2.setForeground(new java.awt.Color(0, 0, 0));
+        jLabel2.setText("🔍 Buscar producto. . .");
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -192,9 +288,6 @@ public class panelProductos extends javax.swing.JPanel {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGap(19, 19, 19)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 872, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(btnEditar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
@@ -208,12 +301,19 @@ public class panelProductos extends javax.swing.JPanel {
                         .addComponent(jLabel1)
                         .addGap(18, 18, 18)
                         .addComponent(cmbCategoria, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(34, 34, 34))))
+                        .addGap(34, 34, 34))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 872, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 127, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(25, 25, 25)
+                .addContainerGap()
+                .addComponent(jLabel2)
+                .addGap(3, 3, 3)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(txtBuscar, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -268,6 +368,130 @@ public class panelProductos extends javax.swing.JPanel {
         // METODO PARA MOSTRAR FORMULARIO
         mostrarDialogoNuevoProducto();
     }//GEN-LAST:event_btnNuevoProductoActionPerformed
+
+    private void btnEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarActionPerformed
+        int fila = tblProductos.getSelectedRow();
+
+        if (fila == -1) {
+
+            JOptionPane.showMessageDialog(this, "Seleccione un producto.");
+
+            return;
+        }
+
+        String codigo = tblProductos.getValueAt(fila, 0).toString();
+
+        int respuesta = JOptionPane.showConfirmDialog(this,
+            "¿Desea eliminar el producto?",
+            "Confirmar",
+            JOptionPane.YES_NO_OPTION
+        );
+
+        if (respuesta == JOptionPane.YES_OPTION) {
+
+            controlador.eliminarProducto(codigo);
+
+            cargarTabla();
+
+            JOptionPane.showMessageDialog(this,"Producto eliminado.");
+        }
+    }//GEN-LAST:event_btnEliminarActionPerformed
+
+    private void btnEditarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditarActionPerformed
+        
+        int fila = tblProductos.getSelectedRow();
+
+        if (fila == -1) {
+
+            JOptionPane.showMessageDialog(this,"Seleccione un producto.");
+
+        return;
+        }
+
+        String codigo = tblProductos.getValueAt(fila, 0).toString();
+
+        Producto producto = controlador.buscarPorCodigo(codigo);
+
+        if (producto == null) {
+            return;
+        }
+
+        JTextField txtNom = new JTextField(producto.getNombre());
+        JTextField txtPre = new JTextField(String.valueOf(producto.getPrecio()));
+        JTextField txtSto = new JTextField(String.valueOf(producto.getStock()));
+
+        String[] categorias = {
+            "Polos",
+            "Shorts",
+            "Casacas",
+            "Buzos",
+            "Accesorios"
+        };
+
+        JComboBox<String> cmbCat = new JComboBox<>(categorias);
+
+        cmbCat.setSelectedItem(producto.getCategoria());
+
+        Object[] campos = {
+            "Código:", producto.getCodigo(),
+            "Nombre:", txtNom,
+            "Categoría:", cmbCat,
+            "Precio:", txtPre,
+            "Stock:", txtSto
+        };
+
+        int respuesta = JOptionPane.showConfirmDialog(
+            this,
+            campos,
+            "Editar Producto",
+            JOptionPane.OK_CANCEL_OPTION
+        );
+
+        if (respuesta == JOptionPane.OK_OPTION) {
+
+            try {
+
+                Producto actualizado = new Producto(
+                            producto.getCodigo(),
+                            txtNom.getText().trim(),
+                            (String) cmbCat.getSelectedItem(),
+                            Double.parseDouble(
+                                    txtPre.getText().trim()),
+                            Integer.parseInt(
+                                    txtSto.getText().trim())
+                );
+
+                controlador.actualizarProducto(actualizado);
+
+                cargarTabla();
+
+                JOptionPane.showMessageDialog(
+                    this,
+                    "Producto actualizado."
+            );
+
+            } catch (NumberFormatException ex) {
+
+                JOptionPane.showMessageDialog(
+                    this,
+                    "Precio y stock deben ser numéricos."
+            );
+        }
+    }
+                  
+    }//GEN-LAST:event_btnEditarActionPerformed
+
+    private void txtBuscarKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtBuscarKeyReleased
+        
+    }//GEN-LAST:event_txtBuscarKeyReleased
+
+    private void cmbCategoriaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbCategoriaActionPerformed
+        filtrarPorCategoria();
+    }//GEN-LAST:event_cmbCategoriaActionPerformed
+
+    private void txtBuscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtBuscarActionPerformed
+        buscarProducto();
+    }//GEN-LAST:event_txtBuscarActionPerformed
 
     //METODO AGREGAR PRODUCTO
     private void mostrarDialogoNuevoProducto() {
@@ -327,56 +551,6 @@ public class panelProductos extends javax.swing.JPanel {
     }
     
     
-    public class panelProductos extends javax.swing.JPanel {
-
-    private ControlProducto controlador;
-
-    public panelProductos() {
-        initComponents();
-
-        controlador = new ControlProducto();
-
-        cargarTabla();
-    }
-
-    private void cargarTabla() {
-
-        DefaultTableModel modelo = (DefaultTableModel) tblProductos.getModel();
-
-        modelo.setRowCount(0);
-
-        Nodo<Producto> aux = controlador.getProductos().getCabeza();
-
-        while (aux != null) {
-
-            Producto p = aux.getDato();
-
-            modelo.addRow(new Object[]{
-                p.getCodigo(),
-                p.getNombre(),
-                p.getCategoria(),
-                p.getPrecio(),
-                p.getStock()
-            });
-
-                aux = aux.getSiguiente();
-        }
-
-            lblTotalProductos.setText(
-                "Total de productos: "
-                + controlador.getProductos().tamaño()
-            );
-        }
-
-    }
-    
-    
-    
-    
-    
-    
-    
-
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnEditar;
@@ -384,6 +558,7 @@ public class panelProductos extends javax.swing.JPanel {
     private javax.swing.JButton btnNuevoProducto;
     private javax.swing.JComboBox<String> cmbCategoria;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel lblSubtitulo;

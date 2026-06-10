@@ -26,13 +26,13 @@ public class ListaEnlazada<T> {
             return;
         }
 
-        Nodo<T> aux = cabeza;
+        Nodo<T> temp = cabeza;
 
-        while (aux.getSiguiente() != null) {
-            aux = aux.getSiguiente();
+        while (temp.getSiguiente() != null) {
+            temp = temp.getSiguiente();
         }
 
-        aux.setSiguiente(nuevo);
+        temp.setSiguiente(nuevo);
     }
 
     public Nodo<T> getCabeza() {
@@ -43,13 +43,43 @@ public class ListaEnlazada<T> {
 
         int contador = 0;
 
-        Nodo<T> aux = cabeza;
+        Nodo<T> temp = cabeza;
 
-        while (aux != null) {
+        while (temp != null) {
             contador++;
-            aux = aux.getSiguiente();
+            temp = temp.getSiguiente();
         }
 
         return contador;
     }
+    
+    //METODO PARA ELIMIAR
+    public boolean eliminar(T dato) {
+
+    if (cabeza == null) {
+        return false;
+    }
+
+    if (cabeza.getDato().equals(dato)) {
+        cabeza = cabeza.getSiguiente();
+        return true;
+    }
+
+    Nodo<T> actual = cabeza;
+    Nodo<T> anterior = null;
+
+    while (actual != null) {
+
+        if (actual.getDato().equals(dato)) {
+            anterior.setSiguiente(actual.getSiguiente());
+            return true;
+        }
+
+        anterior = actual;
+        actual = actual.getSiguiente();
+    }
+
+    return false;
+    }
+    
 }
