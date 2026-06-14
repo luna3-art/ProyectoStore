@@ -4,17 +4,118 @@
  */
 package vista2;
 
-/**
- *
- * @author Luna
- */
+import Controladores.ControlPedido;
+import Modelo.Pedido;
+import Estructuras.Nodo;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.JOptionPane;
+import javax.swing.JTextField;
+import javax.swing.JComboBox;
+
 public class panelPedidos extends javax.swing.JPanel {
 
     /**
      * Creates new form panelPedidos
      */
+    private ControlPedido controlador;
+
     public panelPedidos() {
         initComponents();
+        controlador = new ControlPedido();
+        cargarTabla();
+    }
+
+    //METODO
+    private void cargarTabla() {
+
+        DefaultTableModel modelo
+                = (DefaultTableModel) tblPedidos.getModel();
+
+        modelo.setRowCount(0);
+
+        Nodo<Pedido> aux
+                = controlador.getPedidos().getFrenteNodo();
+
+        while (aux != null) {
+
+            Pedido p = aux.getDato();
+
+            modelo.addRow(new Object[]{
+                p.getIdPedido(),
+                p.getCliente(),
+                p.getFecha(),
+                p.getTotal(),
+                p.getEstado(),
+                ""
+            });
+
+            aux = aux.getSiguiente();
+        }
+    }
+
+    //METODO PARA AGREGAR PEDIDO
+    private void mostrarDialogoNuevoPedido() {
+
+        JTextField txtId = new JTextField();
+        JTextField txtCliente = new JTextField();
+        JTextField txtFecha = new JTextField();
+        JTextField txtTotal = new JTextField();
+
+        String[] estados = {
+            "Pendiente",
+            "En Proceso",
+            "Completado",
+            "Cancelado"
+        };
+
+        JComboBox<String> cmbEstado
+                = new JComboBox<>(estados);
+
+        Object[] campos = {
+            "ID Pedido:", txtId,
+            "Cliente:", txtCliente,
+            "Fecha:", txtFecha,
+            "Total:", txtTotal,
+            "Estado:", cmbEstado
+        };
+
+        int respuesta = JOptionPane.showConfirmDialog(
+                this,
+                campos,
+                "Nuevo Pedido",
+                JOptionPane.OK_CANCEL_OPTION
+        );
+
+        if (respuesta == JOptionPane.OK_OPTION) {
+
+            try {
+
+                Pedido pedido = new Pedido(
+                        txtId.getText().trim(),
+                        txtCliente.getText().trim(),
+                        txtFecha.getText().trim(),
+                        Double.parseDouble(
+                                txtTotal.getText().trim()),
+                        (String) cmbEstado.getSelectedItem()
+                );
+
+                controlador.agregarPedido(pedido);
+
+                cargarTabla();
+
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Pedido agregado correctamente."
+                );
+
+            } catch (NumberFormatException ex) {
+
+                JOptionPane.showMessageDialog(
+                        this,
+                        "El total debe ser numérico."
+                );
+            }
+        }
     }
 
     /**
@@ -28,14 +129,14 @@ public class panelPedidos extends javax.swing.JPanel {
 
         lblInventario = new javax.swing.JLabel();
         lblSubtitulo3 = new javax.swing.JLabel();
-        btnNuevoProducto = new javax.swing.JButton();
+        btnNuevoPedido = new javax.swing.JButton();
         btnEnProceso = new javax.swing.JButton();
         btnPendientes = new javax.swing.JButton();
         btnCancelados = new javax.swing.JButton();
         btnCompletados = new javax.swing.JButton();
         panelPedidoss = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
+        tblPedidos = new javax.swing.JTable();
         panelDetallePedido = new javax.swing.JPanel();
         jLabel1e = new javax.swing.JLabel();
         jLabel1e1 = new javax.swing.JLabel();
@@ -55,13 +156,18 @@ public class panelPedidos extends javax.swing.JPanel {
         lblSubtitulo3.setForeground(new java.awt.Color(17, 24, 39));
         lblSubtitulo3.setText("Administra y procesa los pedidos de los clientes.");
 
-        btnNuevoProducto.setBackground(new java.awt.Color(179, 227, 4));
-        btnNuevoProducto.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        btnNuevoProducto.setForeground(new java.awt.Color(0, 0, 0));
-        btnNuevoProducto.setText("+ Nuevo Pedido");
-        btnNuevoProducto.setAlignmentX(780.0F);
-        btnNuevoProducto.setAlignmentY(35.0F);
-        btnNuevoProducto.setPreferredSize(new java.awt.Dimension(160, 40));
+        btnNuevoPedido.setBackground(new java.awt.Color(179, 227, 4));
+        btnNuevoPedido.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        btnNuevoPedido.setForeground(new java.awt.Color(0, 0, 0));
+        btnNuevoPedido.setText("+ Nuevo Pedido");
+        btnNuevoPedido.setAlignmentX(780.0F);
+        btnNuevoPedido.setAlignmentY(35.0F);
+        btnNuevoPedido.setPreferredSize(new java.awt.Dimension(160, 40));
+        btnNuevoPedido.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnNuevoPedidoActionPerformed(evt);
+            }
+        });
 
         btnEnProceso.setBackground(new java.awt.Color(0, 0, 0));
         btnEnProceso.setForeground(new java.awt.Color(179, 227, 4));
@@ -97,8 +203,8 @@ public class panelPedidos extends javax.swing.JPanel {
 
         jScrollPane1.setBackground(new java.awt.Color(255, 255, 255));
 
-        jTable1.setBackground(new java.awt.Color(255, 255, 255));
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+        tblPedidos.setBackground(new java.awt.Color(255, 255, 255));
+        tblPedidos.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null, null, null},
                 {null, null, null, null, null, null},
@@ -117,14 +223,14 @@ public class panelPedidos extends javax.swing.JPanel {
                 return canEdit [columnIndex];
             }
         });
-        jScrollPane1.setViewportView(jTable1);
-        if (jTable1.getColumnModel().getColumnCount() > 0) {
-            jTable1.getColumnModel().getColumn(0).setResizable(false);
-            jTable1.getColumnModel().getColumn(1).setResizable(false);
-            jTable1.getColumnModel().getColumn(2).setResizable(false);
-            jTable1.getColumnModel().getColumn(3).setResizable(false);
-            jTable1.getColumnModel().getColumn(4).setResizable(false);
-            jTable1.getColumnModel().getColumn(5).setResizable(false);
+        jScrollPane1.setViewportView(tblPedidos);
+        if (tblPedidos.getColumnModel().getColumnCount() > 0) {
+            tblPedidos.getColumnModel().getColumn(0).setResizable(false);
+            tblPedidos.getColumnModel().getColumn(1).setResizable(false);
+            tblPedidos.getColumnModel().getColumn(2).setResizable(false);
+            tblPedidos.getColumnModel().getColumn(3).setResizable(false);
+            tblPedidos.getColumnModel().getColumn(4).setResizable(false);
+            tblPedidos.getColumnModel().getColumn(5).setResizable(false);
         }
 
         javax.swing.GroupLayout panelPedidossLayout = new javax.swing.GroupLayout(panelPedidoss);
@@ -228,7 +334,7 @@ public class panelPedidos extends javax.swing.JPanel {
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(lblInventario)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(btnNuevoProducto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addComponent(btnNuevoPedido, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                         .addGap(62, 62, 62))))
         );
         layout.setVerticalGroup(
@@ -237,7 +343,7 @@ public class panelPedidos extends javax.swing.JPanel {
                 .addGap(51, 51, 51)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lblInventario)
-                    .addComponent(btnNuevoProducto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(btnNuevoPedido, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(lblSubtitulo3)
                 .addGap(29, 29, 29)
@@ -262,22 +368,26 @@ public class panelPedidos extends javax.swing.JPanel {
         // TODO add your handling code here:
     }//GEN-LAST:event_panelPedidossComponentAdded
 
+    private void btnNuevoPedidoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNuevoPedidoActionPerformed
+        mostrarDialogoNuevoPedido();
+    }//GEN-LAST:event_btnNuevoPedidoActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCancelados;
     private javax.swing.JButton btnCompletados;
     private javax.swing.JButton btnEnProceso;
-    private javax.swing.JButton btnNuevoProducto;
+    private javax.swing.JButton btnNuevoPedido;
     private javax.swing.JButton btnPendientes;
     private javax.swing.JLabel jLabel1e;
     private javax.swing.JLabel jLabel1e1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPaneDetallePedido;
-    private javax.swing.JTable jTable1;
     private javax.swing.JLabel lblInventario;
     private javax.swing.JLabel lblSubtitulo3;
     private javax.swing.JPanel panelDetallePedido;
     private javax.swing.JPanel panelPedidoss;
     private javax.swing.JTable tablaDetallePedido;
+    private javax.swing.JTable tblPedidos;
     // End of variables declaration//GEN-END:variables
 }

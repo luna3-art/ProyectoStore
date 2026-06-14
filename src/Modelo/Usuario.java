@@ -28,7 +28,6 @@ public class Usuario {
     }
     
     // Métodos set
-
     public void setUsuario(String usuario) {
         this.usuario = usuario;
     }

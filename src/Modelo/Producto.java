@@ -54,7 +54,6 @@ public class Producto {
 
     
     // Métodos set
-
     public void setCodigo(String codigo) {
         this.codigo = codigo;
     }
