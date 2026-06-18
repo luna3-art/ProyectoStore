@@ -10,7 +10,9 @@ import Estructuras.Nodo;
 import Modelo.Pedido;
 
 import Modelo.DetallePedido;
+import Modelo.Movimiento;
 import Modelo.Producto;
+import java.time.LocalDate;
 
 public class ControlPedido {
 
@@ -100,6 +102,16 @@ public class ControlPedido {
                     producto.setStock(producto.getStock() - d.getCantidad());
 
                     DatosSistema.totalSalidas += d.getCantidad();
+
+                    DatosSistema.movimientos.agregar(
+                            new Movimiento(
+                                    LocalDate.now().toString(),
+                                    "SALIDA",
+                                    producto.getNombre(),
+                                    detalle.getDato().getCantidad(),
+                                    "Venta completada"
+                            )
+                    );
 
                     detalle = detalle.getSiguiente();
                 }

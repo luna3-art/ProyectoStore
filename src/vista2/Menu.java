@@ -136,6 +136,11 @@ public class Menu extends javax.swing.JFrame {
         btnMovimientos.setText("📋 Movimientos");
         btnMovimientos.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         btnMovimientos.setPreferredSize(new java.awt.Dimension(180, 40));
+        btnMovimientos.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnMovimientosActionPerformed(evt);
+            }
+        });
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vista2/EMS_logo_sidebar_170x85.png"))); // NOI18N
 
@@ -264,6 +269,14 @@ public class Menu extends javax.swing.JFrame {
         Login2 login = new Login2();
         login.setVisible(true);
     }//GEN-LAST:event_btnCerrarSesionActionPerformed
+
+    private void btnMovimientosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMovimientosActionPerformed
+        //INSTANCIAMOS MOVIMIENTOS
+        panelMovimientos movimientos = new panelMovimientos();
+        
+        //mostramos
+        mostrarPanel(movimientos);
+    }//GEN-LAST:event_btnMovimientosActionPerformed
 
     /**
      * @param args the command line arguments

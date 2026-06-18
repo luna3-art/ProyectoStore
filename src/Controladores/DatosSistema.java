@@ -4,6 +4,8 @@
  */
 package Controladores;
 
+import Estructuras.ListaEnlazada;
+import Modelo.Movimiento;
 
 public class DatosSistema {
     
@@ -13,4 +15,7 @@ public class DatosSistema {
     
     public static int totalEntradas = 0;
     public static int totalSalidas = 0;
+    
+    public static ListaEnlazada<Movimiento> movimientos = new ListaEnlazada<>();
+    
 }

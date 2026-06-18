@@ -8,7 +8,9 @@ import Controladores.ControlPedido;
 import Controladores.ControlProducto;
 import Controladores.DatosSistema;
 import Estructuras.Nodo;
+import Modelo.Movimiento;
 import Modelo.Producto;
+import java.time.LocalDate;
 
 import javax.swing.table.DefaultTableModel;
 import javax.swing.JComboBox;
@@ -443,7 +445,7 @@ public class panelInventario extends javax.swing.JPanel {
         lblProductos.setText(String.valueOf(totalProductos));
         lblEntradas.setText(String.valueOf(DatosSistema.totalEntradas));
         lblSalidas.setText(String.valueOf(DatosSistema.totalSalidas));
-        
+
     }
 
     //FORMULARIO ENTRADA DE STOCK
@@ -483,8 +485,18 @@ public class panelInventario extends javax.swing.JPanel {
                 int cantidad = Integer.parseInt(txtCantidad.getText());
 
                 producto.setStock(producto.getStock() + cantidad);
-                
+
                 DatosSistema.totalEntradas += cantidad;
+
+                DatosSistema.movimientos.agregar(
+                        new Movimiento(
+                                LocalDate.now().toString(),
+                                "ENTRADA",
+                                producto.getNombre(),
+                                cantidad,
+                                "Ingreso de stock"
+                        )
+                );
 
                 cargarTabla();
 
