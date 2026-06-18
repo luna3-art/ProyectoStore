@@ -12,20 +12,30 @@ import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.JComboBox;
 
+import java.time.LocalDate;
+import Controladores.DatosSistema;
+
+import Modelo.Producto;
+import Modelo.DetallePedido;
+import Controladores.DatosSistema;
+import Controladores.ControlProducto;
+
 public class panelPedidos extends javax.swing.JPanel {
 
     /**
      * Creates new form panelPedidos
      */
-    private ControlPedido controlador;
+    private ControlPedido controlador = DatosSistema.controlPedido;
+    private ControlProducto controlProducto = DatosSistema.controlProducto;
 
     public panelPedidos() {
         initComponents();
-        controlador = new ControlPedido();
+
+        cboxPedidos.setSelectedItem("Pendientes");
         cargarTabla();
     }
 
-    //METODO
+    //METODO PARA CARGAR LA TABLA
     private void cargarTabla() {
 
         DefaultTableModel modelo
@@ -33,23 +43,89 @@ public class panelPedidos extends javax.swing.JPanel {
 
         modelo.setRowCount(0);
 
-        Nodo<Pedido> aux
-                = controlador.getPedidos().getFrenteNodo();
+        String filtro
+                = cboxPedidos.getSelectedItem().toString();
 
-        while (aux != null) {
+        if (filtro.equals("Pendientes")) {
 
-            Pedido p = aux.getDato();
+            Nodo<Pedido> aux
+                    = controlador.getPendientes().getFrenteNodo();
 
-            modelo.addRow(new Object[]{
-                p.getIdPedido(),
-                p.getCliente(),
-                p.getFecha(),
-                p.getTotal(),
-                p.getEstado(),
-                ""
-            });
+            while (aux != null) {
 
-            aux = aux.getSiguiente();
+                Pedido p = aux.getDato();
+
+                modelo.addRow(new Object[]{
+                    p.getIdPedido(),
+                    p.getCliente(),
+                    p.getFecha(),
+                    p.getTotal(),
+                    p.getEstado(),
+                    ""
+                });
+
+                aux = aux.getSiguiente();
+            }
+        } else if (filtro.equals("En Proceso")) {
+
+            Nodo<Pedido> aux
+                    = controlador.getEnProceso().getCabeza();
+
+            while (aux != null) {
+
+                Pedido p = aux.getDato();
+
+                modelo.addRow(new Object[]{
+                    p.getIdPedido(),
+                    p.getCliente(),
+                    p.getFecha(),
+                    p.getTotal(),
+                    p.getEstado(),
+                    ""
+                });
+
+                aux = aux.getSiguiente();
+            }
+        } else if (filtro.equals("Completados")) {
+
+            Nodo<Pedido> aux
+                    = controlador.getCompletados().getCabeza();
+
+            while (aux != null) {
+
+                Pedido p = aux.getDato();
+
+                modelo.addRow(new Object[]{
+                    p.getIdPedido(),
+                    p.getCliente(),
+                    p.getFecha(),
+                    p.getTotal(),
+                    p.getEstado(),
+                    ""
+                });
+
+                aux = aux.getSiguiente();
+            }
+        } else if (filtro.equals("Cancelados")) {
+
+            Nodo<Pedido> aux
+                    = controlador.getCancelados().getCabeza();
+
+            while (aux != null) {
+
+                Pedido p = aux.getDato();
+
+                modelo.addRow(new Object[]{
+                    p.getIdPedido(),
+                    p.getCliente(),
+                    p.getFecha(),
+                    p.getTotal(),
+                    p.getEstado(),
+                    ""
+                });
+
+                aux = aux.getSiguiente();
+            }
         }
     }
 
@@ -58,25 +134,10 @@ public class panelPedidos extends javax.swing.JPanel {
 
         JTextField txtId = new JTextField();
         JTextField txtCliente = new JTextField();
-        JTextField txtFecha = new JTextField();
-        JTextField txtTotal = new JTextField();
-
-        String[] estados = {
-            "Pendiente",
-            "En Proceso",
-            "Completado",
-            "Cancelado"
-        };
-
-        JComboBox<String> cmbEstado
-                = new JComboBox<>(estados);
 
         Object[] campos = {
             "ID Pedido:", txtId,
-            "Cliente:", txtCliente,
-            "Fecha:", txtFecha,
-            "Total:", txtTotal,
-            "Estado:", cmbEstado
+            "Cliente:", txtCliente
         };
 
         int respuesta = JOptionPane.showConfirmDialog(
@@ -86,36 +147,135 @@ public class panelPedidos extends javax.swing.JPanel {
                 JOptionPane.OK_CANCEL_OPTION
         );
 
-        if (respuesta == JOptionPane.OK_OPTION) {
+        if (respuesta != JOptionPane.OK_OPTION) {
+            return;
+        }
+
+        String fechaActual = LocalDate.now().toString();
+
+        Pedido pedido = new Pedido(
+                txtId.getText().trim(),
+                txtCliente.getText().trim(),
+                fechaActual,
+                0,
+                "Pendiente"
+        );
+
+        boolean seguir = true;
+
+        while (seguir) {
+
+            JComboBox<Producto> cmbProductos = new JComboBox<>();
+
+            Nodo<Producto> temp = controlProducto.getProductos().getCabeza();
+
+            while (temp != null) {
+
+                cmbProductos.addItem(temp.getDato());
+
+                temp = temp.getSiguiente();
+            }
+
+            JTextField txtCantidad
+                    = new JTextField();
+
+            Object[] detalle = {
+                "Producto:", cmbProductos,
+                "Cantidad:", txtCantidad
+            };
+
+            int r = JOptionPane.showConfirmDialog(
+                    this,
+                    detalle,
+                    "Agregar Producto",
+                    JOptionPane.OK_CANCEL_OPTION
+            );
+
+            if (r != JOptionPane.OK_OPTION) {
+                break;
+            }
 
             try {
 
-                Pedido pedido = new Pedido(
-                        txtId.getText().trim(),
-                        txtCliente.getText().trim(),
-                        txtFecha.getText().trim(),
-                        Double.parseDouble(
-                                txtTotal.getText().trim()),
-                        (String) cmbEstado.getSelectedItem()
-                );
+                Producto producto = (Producto) cmbProductos.getSelectedItem();
 
-                controlador.agregarPedido(pedido);
+                int cantidad = Integer.parseInt(txtCantidad.getText());
 
-                cargarTabla();
+                DetallePedido det = new DetallePedido(producto, cantidad);
 
-                JOptionPane.showMessageDialog(
+                pedido.agregarDetalle(det);
+
+                int opcion = JOptionPane.showConfirmDialog(
                         this,
-                        "Pedido agregado correctamente."
+                        "¿Agregar otro producto?",
+                        "Continuar",
+                        JOptionPane.YES_NO_OPTION
                 );
+
+                seguir = opcion == JOptionPane.YES_OPTION;
 
             } catch (NumberFormatException ex) {
 
                 JOptionPane.showMessageDialog(
                         this,
-                        "El total debe ser numérico."
+                        "Cantidad inválida."
                 );
             }
         }
+
+        controlador.agregarPedido(pedido);
+
+        cargarTabla();
+
+        JOptionPane.showMessageDialog(this, "Pedido registrado correctamente.\n" + "Total: S/ " + pedido.getTotal());
+    }
+
+    //METODO PARA CARGAR DETALLES
+    private void mostrarDetallePedido() {
+
+        int fila = tblPedidos.getSelectedRow();
+
+        if (fila == -1) {
+            return;
+        }
+
+        String idPedido = tblPedidos.getValueAt(fila, 0).toString();
+
+        Pedido pedido = controlador.buscarPedido(idPedido);
+
+        if (pedido == null) {
+            return;
+        }
+
+        DefaultTableModel modelo
+                = (DefaultTableModel) tablaDetallePedido.getModel();
+
+        modelo.setRowCount(0);
+
+        Nodo<DetallePedido> aux
+                = pedido.getDetalles().getCabeza();
+
+        while (aux != null) {
+
+            DetallePedido d = aux.getDato();
+
+            modelo.addRow(new Object[]{
+                d.getProducto().getNombre(),
+                d.getCantidad(),
+                d.getProducto().getPrecio(),
+                d.getSubtotal()
+            });
+
+            aux = aux.getSiguiente();
+        }
+
+        jLabel1e.setText(
+                "Detalle del Pedido #" + pedido.getIdPedido()
+        );
+
+        jLabel1e1.setText(
+                "Total: S/ " + pedido.getTotal()
+        );
     }
 
     /**
@@ -127,13 +287,10 @@ public class panelPedidos extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jLabel1 = new javax.swing.JLabel();
         lblInventario = new javax.swing.JLabel();
         lblSubtitulo3 = new javax.swing.JLabel();
         btnNuevoPedido = new javax.swing.JButton();
-        btnEnProceso = new javax.swing.JButton();
-        btnPendientes = new javax.swing.JButton();
-        btnCancelados = new javax.swing.JButton();
-        btnCompletados = new javax.swing.JButton();
         panelPedidoss = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         tblPedidos = new javax.swing.JTable();
@@ -142,6 +299,17 @@ public class panelPedidos extends javax.swing.JPanel {
         jLabel1e1 = new javax.swing.JLabel();
         jScrollPaneDetallePedido = new javax.swing.JScrollPane();
         tablaDetallePedido = new javax.swing.JTable();
+        btnProcesar = new javax.swing.JButton();
+        btnCompletar = new javax.swing.JButton();
+        btnCancelar = new javax.swing.JButton();
+        cboxPedidos = new javax.swing.JComboBox<>();
+        jLabel2 = new javax.swing.JLabel();
+
+        jLabel1.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        jLabel1.setForeground(new java.awt.Color(0, 0, 0));
+        jLabel1.setText("Categoría:");
+        jLabel1.setAlignmentX(650.0F);
+        jLabel1.setAlignmentY(25.0F);
 
         setBackground(new java.awt.Color(248, 249, 251));
         setPreferredSize(new java.awt.Dimension(1000, 700));
@@ -169,31 +337,6 @@ public class panelPedidos extends javax.swing.JPanel {
             }
         });
 
-        btnEnProceso.setBackground(new java.awt.Color(0, 0, 0));
-        btnEnProceso.setForeground(new java.awt.Color(179, 227, 4));
-        btnEnProceso.setText("En Proceso");
-        btnEnProceso.setPreferredSize(new java.awt.Dimension(120, 35));
-
-        btnPendientes.setBackground(new java.awt.Color(0, 0, 0));
-        btnPendientes.setForeground(new java.awt.Color(179, 227, 4));
-        btnPendientes.setText("Pendientes");
-        btnPendientes.setPreferredSize(new java.awt.Dimension(120, 35));
-
-        btnCancelados.setBackground(new java.awt.Color(0, 0, 0));
-        btnCancelados.setForeground(new java.awt.Color(179, 227, 4));
-        btnCancelados.setText("Cancelados");
-        btnCancelados.setPreferredSize(new java.awt.Dimension(120, 35));
-        btnCancelados.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnCanceladosActionPerformed(evt);
-            }
-        });
-
-        btnCompletados.setBackground(new java.awt.Color(0, 0, 0));
-        btnCompletados.setForeground(new java.awt.Color(179, 227, 4));
-        btnCompletados.setText("Completados");
-        btnCompletados.setPreferredSize(new java.awt.Dimension(120, 35));
-
         panelPedidoss.setBackground(new java.awt.Color(255, 255, 255));
         panelPedidoss.addContainerListener(new java.awt.event.ContainerAdapter() {
             public void componentAdded(java.awt.event.ContainerEvent evt) {
@@ -206,21 +349,26 @@ public class panelPedidos extends javax.swing.JPanel {
         tblPedidos.setBackground(new java.awt.Color(255, 255, 255));
         tblPedidos.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null}
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null}
             },
             new String [] {
-                "ID Pedido", "Cliente", "Fecha", "Total", "Estado", "Acciones"
+                "ID Pedido", "Cliente", "Fecha", "Total", "Estado"
             }
         ) {
             boolean[] canEdit = new boolean [] {
-                false, false, false, false, false, false
+                false, false, false, false, false
             };
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {
                 return canEdit [columnIndex];
+            }
+        });
+        tblPedidos.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tblPedidosMouseClicked(evt);
             }
         });
         jScrollPane1.setViewportView(tblPedidos);
@@ -230,7 +378,6 @@ public class panelPedidos extends javax.swing.JPanel {
             tblPedidos.getColumnModel().getColumn(2).setResizable(false);
             tblPedidos.getColumnModel().getColumn(3).setResizable(false);
             tblPedidos.getColumnModel().getColumn(4).setResizable(false);
-            tblPedidos.getColumnModel().getColumn(5).setResizable(false);
         }
 
         javax.swing.GroupLayout panelPedidossLayout = new javax.swing.GroupLayout(panelPedidoss);
@@ -241,7 +388,7 @@ public class panelPedidos extends javax.swing.JPanel {
         );
         panelPedidossLayout.setVerticalGroup(
             panelPedidossLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 242, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 212, javax.swing.GroupLayout.PREFERRED_SIZE)
         );
 
         panelDetallePedido.setBackground(new java.awt.Color(255, 255, 255));
@@ -307,26 +454,72 @@ public class panelPedidos extends javax.swing.JPanel {
                 .addComponent(jScrollPaneDetallePedido, javax.swing.GroupLayout.DEFAULT_SIZE, 183, Short.MAX_VALUE))
         );
 
+        btnProcesar.setBackground(new java.awt.Color(0, 0, 0));
+        btnProcesar.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        btnProcesar.setForeground(new java.awt.Color(179, 227, 4));
+        btnProcesar.setText("Procesar");
+        btnProcesar.setAlignmentX(780.0F);
+        btnProcesar.setAlignmentY(35.0F);
+        btnProcesar.setPreferredSize(new java.awt.Dimension(160, 40));
+        btnProcesar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnProcesarActionPerformed(evt);
+            }
+        });
+
+        btnCompletar.setBackground(new java.awt.Color(0, 0, 0));
+        btnCompletar.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        btnCompletar.setForeground(new java.awt.Color(179, 227, 4));
+        btnCompletar.setText("Completar");
+        btnCompletar.setAlignmentX(780.0F);
+        btnCompletar.setAlignmentY(35.0F);
+        btnCompletar.setPreferredSize(new java.awt.Dimension(160, 40));
+        btnCompletar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCompletarActionPerformed(evt);
+            }
+        });
+
+        btnCancelar.setBackground(new java.awt.Color(0, 0, 0));
+        btnCancelar.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        btnCancelar.setForeground(new java.awt.Color(179, 227, 4));
+        btnCancelar.setText("Cancelar");
+        btnCancelar.setAlignmentX(780.0F);
+        btnCancelar.setAlignmentY(35.0F);
+        btnCancelar.setPreferredSize(new java.awt.Dimension(160, 40));
+        btnCancelar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCancelarActionPerformed(evt);
+            }
+        });
+
+        cboxPedidos.setBackground(new java.awt.Color(255, 255, 255));
+        cboxPedidos.setForeground(new java.awt.Color(0, 0, 0));
+        cboxPedidos.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Pendientes", "En Proceso", "Completados", "Cancelados" }));
+        cboxPedidos.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cboxPedidosActionPerformed(evt);
+            }
+        });
+
+        jLabel2.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        jLabel2.setForeground(new java.awt.Color(0, 0, 0));
+        jLabel2.setText("Estado:");
+        jLabel2.setAlignmentX(650.0F);
+        jLabel2.setAlignmentY(25.0F);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(57, 57, 57)
-                .addComponent(btnPendientes, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(btnEnProceso, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(btnCompletados, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(btnCancelados, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 409, Short.MAX_VALUE))
-            .addGroup(layout.createSequentialGroup()
                 .addGap(43, 43, 43)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(lblSubtitulo3)
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 53, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(cboxPedidos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                             .addComponent(panelDetallePedido, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -335,7 +528,18 @@ public class panelPedidos extends javax.swing.JPanel {
                                 .addComponent(lblInventario)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addComponent(btnNuevoPedido, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addGap(62, 62, 62))))
+                        .addGap(62, 62, 62))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(lblSubtitulo3)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(245, 245, 245)
+                                .addComponent(btnProcesar, javax.swing.GroupLayout.PREFERRED_SIZE, 115, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18)
+                                .addComponent(btnCompletar, javax.swing.GroupLayout.PREFERRED_SIZE, 115, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18)
+                                .addComponent(btnCancelar, javax.swing.GroupLayout.PREFERRED_SIZE, 115, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addContainerGap(331, Short.MAX_VALUE))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -346,23 +550,22 @@ public class panelPedidos extends javax.swing.JPanel {
                     .addComponent(btnNuevoPedido, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(lblSubtitulo3)
-                .addGap(29, 29, 29)
+                .addGap(32, 32, 32)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnEnProceso, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnPendientes, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnCompletados, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnCancelados, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(panelPedidoss, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(cboxPedidos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel2))
                 .addGap(18, 18, 18)
+                .addComponent(panelPedidoss, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnProcesar, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnCompletar, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnCancelar, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(panelDetallePedido, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(16, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
-
-    private void btnCanceladosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCanceladosActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_btnCanceladosActionPerformed
 
     private void panelPedidossComponentAdded(java.awt.event.ContainerEvent evt) {//GEN-FIRST:event_panelPedidossComponentAdded
         // TODO add your handling code here:
@@ -372,15 +575,140 @@ public class panelPedidos extends javax.swing.JPanel {
         mostrarDialogoNuevoPedido();
     }//GEN-LAST:event_btnNuevoPedidoActionPerformed
 
+    private void btnProcesarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnProcesarActionPerformed
+
+        String estado = cboxPedidos.getSelectedItem().toString();
+
+        if (!estado.equals("Pendientes")) {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Solo puedes procesar pedidos pendientes."
+            );
+
+            return;
+        }
+
+        Pedido pedido = controlador.iniciarProceso();
+
+        if (pedido != null) {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Pedido enviado a En Proceso."
+            );
+
+            cargarTabla();
+
+        } else {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "No hay pedidos pendientes."
+            );
+        }
+    }//GEN-LAST:event_btnProcesarActionPerformed
+
+    private void btnCompletarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCompletarActionPerformed
+
+        String estado = cboxPedidos.getSelectedItem().toString();
+
+        if (!estado.equals("En Proceso")) {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Solo puedes completar pedidos En Proceso."
+            );
+
+            return;
+        }
+
+        int fila = tblPedidos.getSelectedRow();
+
+        if (fila == -1) {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Seleccione un pedido."
+            );
+
+            return;
+        }
+
+        String idPedido = tblPedidos.getValueAt(fila, 0).toString();
+
+        boolean completado = controlador.completarPedido(idPedido);
+
+        if (completado) {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Pedido completado y stock actualizado."
+            );
+
+            cargarTabla();
+
+        } else {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "No hay stock suficiente para completar el pedido."
+            );
+        }
+    }//GEN-LAST:event_btnCompletarActionPerformed
+
+    private void btnCancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelarActionPerformed
+
+        int fila = tblPedidos.getSelectedRow();
+
+        if (fila == -1) {
+
+            JOptionPane.showMessageDialog(this, "Seleccione un pedido.");
+
+            return;
+        }
+
+        String idPedido = tblPedidos.getValueAt(fila, 0).toString();
+
+        boolean cancelado = controlador.cancelarPedido(idPedido);
+
+        if (cancelado) {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Pedido cancelado."
+            );
+
+            cargarTabla();
+
+        } else {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "El pedido debe estar En Proceso."
+            );
+        }
+    }//GEN-LAST:event_btnCancelarActionPerformed
+
+    private void cboxPedidosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cboxPedidosActionPerformed
+        cargarTabla();
+    }//GEN-LAST:event_cboxPedidosActionPerformed
+
+    private void tblPedidosMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblPedidosMouseClicked
+        mostrarDetallePedido();
+    }//GEN-LAST:event_tblPedidosMouseClicked
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btnCancelados;
-    private javax.swing.JButton btnCompletados;
-    private javax.swing.JButton btnEnProceso;
+    private javax.swing.JButton btnCancelar;
+    private javax.swing.JButton btnCompletar;
     private javax.swing.JButton btnNuevoPedido;
-    private javax.swing.JButton btnPendientes;
+    private javax.swing.JButton btnProcesar;
+    private javax.swing.JComboBox<String> cboxPedidos;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel1e;
     private javax.swing.JLabel jLabel1e1;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPaneDetallePedido;
     private javax.swing.JLabel lblInventario;

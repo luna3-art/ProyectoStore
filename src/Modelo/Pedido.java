@@ -4,6 +4,7 @@
  */
 package Modelo;
 
+import Estructuras.ListaEnlazada;
 
 public class Pedido {
 
@@ -12,6 +13,8 @@ public class Pedido {
     private String fecha;
     private double total;
     private String estado;
+
+    private ListaEnlazada<DetallePedido> detalles;
 
     public Pedido(String idPedido, String cliente,
                   String fecha, double total,
@@ -22,6 +25,8 @@ public class Pedido {
         this.fecha = fecha;
         this.total = total;
         this.estado = estado;
+
+        detalles = new ListaEnlazada<>();
     }
 
     public String getIdPedido() {
@@ -62,6 +67,17 @@ public class Pedido {
 
     public void setEstado(String estado) {
         this.estado = estado;
+    }
+
+    public ListaEnlazada<DetallePedido> getDetalles() {
+        return detalles;
+    }
+
+    public void agregarDetalle(DetallePedido detalle) {
+
+        detalles.agregar(detalle);
+
+        total += detalle.getSubtotal();
     }
 
     @Override

@@ -14,6 +14,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
 
+import Controladores.DatosSistema;
+
 
 public class panelProductos extends javax.swing.JPanel {
 
@@ -21,11 +23,10 @@ public class panelProductos extends javax.swing.JPanel {
      * Creates new form panelProductos
      */
     
-    private ControlProducto controlador;
+    private ControlProducto controlador = DatosSistema.controlProducto;
     
     public panelProductos() {
         initComponents();
-        controlador = new ControlProducto();
         cargarTabla();              
     }
     
@@ -129,6 +130,7 @@ public class panelProductos extends javax.swing.JPanel {
     private void initComponents() {
 
         lblSubtitulo = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
         lblTitulo = new javax.swing.JLabel();
         lblSubtitulo1 = new javax.swing.JLabel();
         btnNuevoProducto = new javax.swing.JButton();
@@ -146,6 +148,8 @@ public class panelProductos extends javax.swing.JPanel {
         lblSubtitulo.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
         lblSubtitulo.setForeground(new java.awt.Color(17, 24, 39));
         lblSubtitulo.setText("Resumen general del sistema");
+
+        jLabel3.setText("jLabel3");
 
         setBackground(new java.awt.Color(245, 247, 250));
         setName("panelProductos"); // NOI18N
@@ -205,7 +209,7 @@ public class panelProductos extends javax.swing.JPanel {
         cmbCategoria.setBackground(new java.awt.Color(255, 255, 255));
         cmbCategoria.setForeground(new java.awt.Color(0, 0, 0));
         cmbCategoria.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Todas", "Polos", "Shorts", "Casacas", "Buzos", "Accesorios" }));
-        cmbCategoria.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(153, 153, 153)));
+        cmbCategoria.setBorder(null);
         cmbCategoria.setPreferredSize(new java.awt.Dimension(100, 35));
         cmbCategoria.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -559,6 +563,7 @@ public class panelProductos extends javax.swing.JPanel {
     private javax.swing.JComboBox<String> cmbCategoria;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel lblSubtitulo;

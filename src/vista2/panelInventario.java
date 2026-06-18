@@ -4,17 +4,29 @@
  */
 package vista2;
 
-/**
- *
- * @author Luna
- */
+import Controladores.ControlPedido;
+import Controladores.ControlProducto;
+import Controladores.DatosSistema;
+import Estructuras.Nodo;
+import Modelo.Producto;
+
+import javax.swing.table.DefaultTableModel;
+import javax.swing.JComboBox;
+import javax.swing.JTextField;
+import javax.swing.JOptionPane;
+
 public class panelInventario extends javax.swing.JPanel {
 
     /**
      * Creates new form panelInventario
      */
+    private ControlProducto controlProducto = DatosSistema.controlProducto;
+
+    private ControlPedido controlPedido = DatosSistema.controlPedido;
+
     public panelInventario() {
         initComponents();
+        cargarTabla();
     }
 
     /**
@@ -32,24 +44,24 @@ public class panelInventario extends javax.swing.JPanel {
         btnActualizarInventario = new javax.swing.JButton();
         cardStock = new javax.swing.JPanel();
         jLabel33 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
+        lblStockTotal = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
         cardEntradas = new javax.swing.JPanel();
         jLabel34 = new javax.swing.JLabel();
-        jLabel4 = new javax.swing.JLabel();
+        lblEntradas = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
         cardSalidas = new javax.swing.JPanel();
         jLabel35 = new javax.swing.JLabel();
-        jLabel6 = new javax.swing.JLabel();
+        lblSalidas = new javax.swing.JLabel();
         jLabel7 = new javax.swing.JLabel();
         cardProductos = new javax.swing.JPanel();
         jLabel36 = new javax.swing.JLabel();
-        jLabel8 = new javax.swing.JLabel();
+        lblProductos = new javax.swing.JLabel();
         jLabel9 = new javax.swing.JLabel();
         panelMovimientos = new javax.swing.JPanel();
-        jLabel14 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         tablaMovimientos = new javax.swing.JTable();
+        btnEntradaInventario = new javax.swing.JButton();
 
         jLabel13.setFont(new java.awt.Font("Segoe UI Emoji", 1, 18)); // NOI18N
         jLabel13.setForeground(new java.awt.Color(0, 0, 0));
@@ -76,6 +88,11 @@ public class panelInventario extends javax.swing.JPanel {
         btnActualizarInventario.setAlignmentX(780.0F);
         btnActualizarInventario.setAlignmentY(35.0F);
         btnActualizarInventario.setPreferredSize(new java.awt.Dimension(160, 40));
+        btnActualizarInventario.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnActualizarInventarioActionPerformed(evt);
+            }
+        });
 
         cardStock.setBackground(new java.awt.Color(255, 255, 255));
         cardStock.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(153, 153, 153), 2));
@@ -86,11 +103,13 @@ public class panelInventario extends javax.swing.JPanel {
 
         jLabel33.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         jLabel33.setForeground(new java.awt.Color(0, 0, 0));
+        jLabel33.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel33.setText("Stock Total");
 
-        jLabel2.setFont(new java.awt.Font("Segoe UI", 1, 36)); // NOI18N
-        jLabel2.setForeground(new java.awt.Color(0, 0, 0));
-        jLabel2.setText("350");
+        lblStockTotal.setFont(new java.awt.Font("Segoe UI", 1, 36)); // NOI18N
+        lblStockTotal.setForeground(new java.awt.Color(0, 0, 0));
+        lblStockTotal.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblStockTotal.setText("350");
 
         jLabel3.setFont(new java.awt.Font("Segoe UI", 0, 13)); // NOI18N
         jLabel3.setForeground(new java.awt.Color(0, 0, 0));
@@ -101,18 +120,11 @@ public class panelInventario extends javax.swing.JPanel {
         cardStockLayout.setHorizontalGroup(
             cardStockLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(cardStockLayout.createSequentialGroup()
-                .addGroup(cardStockLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(cardStockLayout.createSequentialGroup()
-                        .addGap(65, 65, 65)
-                        .addComponent(jLabel3))
-                    .addGroup(cardStockLayout.createSequentialGroup()
-                        .addGap(42, 42, 42)
-                        .addComponent(jLabel33)))
-                .addContainerGap(47, Short.MAX_VALUE))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, cardStockLayout.createSequentialGroup()
-                .addGap(0, 0, Short.MAX_VALUE)
-                .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(65, 65, 65)
+                .addComponent(jLabel3)
+                .addContainerGap(69, Short.MAX_VALUE))
+            .addComponent(lblStockTotal, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jLabel33, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         cardStockLayout.setVerticalGroup(
             cardStockLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -120,7 +132,7 @@ public class panelInventario extends javax.swing.JPanel {
                 .addGap(18, 18, 18)
                 .addComponent(jLabel33)
                 .addGap(18, 18, 18)
-                .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(lblStockTotal, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 25, Short.MAX_VALUE)
                 .addComponent(jLabel3)
                 .addGap(15, 15, 15))
@@ -135,11 +147,13 @@ public class panelInventario extends javax.swing.JPanel {
 
         jLabel34.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         jLabel34.setForeground(new java.awt.Color(0, 0, 0));
+        jLabel34.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel34.setText("Entradas");
 
-        jLabel4.setFont(new java.awt.Font("Segoe UI", 1, 36)); // NOI18N
-        jLabel4.setForeground(new java.awt.Color(0, 0, 0));
-        jLabel4.setText("350");
+        lblEntradas.setFont(new java.awt.Font("Segoe UI", 1, 36)); // NOI18N
+        lblEntradas.setForeground(new java.awt.Color(0, 0, 0));
+        lblEntradas.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblEntradas.setText("350");
 
         jLabel5.setFont(new java.awt.Font("Segoe UI", 0, 13)); // NOI18N
         jLabel5.setForeground(new java.awt.Color(0, 0, 0));
@@ -153,12 +167,8 @@ public class panelInventario extends javax.swing.JPanel {
                 .addGap(65, 65, 65)
                 .addComponent(jLabel5)
                 .addContainerGap(72, Short.MAX_VALUE))
-            .addGroup(cardEntradasLayout.createSequentialGroup()
-                .addGap(0, 0, Short.MAX_VALUE)
-                .addGroup(cardEntradasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jLabel34)
-                    .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addComponent(lblEntradas, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jLabel34, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         cardEntradasLayout.setVerticalGroup(
             cardEntradasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -166,7 +176,7 @@ public class panelInventario extends javax.swing.JPanel {
                 .addGap(18, 18, 18)
                 .addComponent(jLabel34)
                 .addGap(18, 18, 18)
-                .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(lblEntradas, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 25, Short.MAX_VALUE)
                 .addComponent(jLabel5)
                 .addGap(15, 15, 15))
@@ -181,11 +191,13 @@ public class panelInventario extends javax.swing.JPanel {
 
         jLabel35.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         jLabel35.setForeground(new java.awt.Color(0, 0, 0));
+        jLabel35.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel35.setText("Salidas");
 
-        jLabel6.setFont(new java.awt.Font("Segoe UI", 1, 36)); // NOI18N
-        jLabel6.setForeground(new java.awt.Color(0, 0, 0));
-        jLabel6.setText("350");
+        lblSalidas.setFont(new java.awt.Font("Segoe UI", 1, 36)); // NOI18N
+        lblSalidas.setForeground(new java.awt.Color(0, 0, 0));
+        lblSalidas.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblSalidas.setText("350");
 
         jLabel7.setFont(new java.awt.Font("Segoe UI", 0, 13)); // NOI18N
         jLabel7.setForeground(new java.awt.Color(0, 0, 0));
@@ -197,11 +209,10 @@ public class panelInventario extends javax.swing.JPanel {
             cardSalidasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(cardSalidasLayout.createSequentialGroup()
                 .addGap(65, 65, 65)
-                .addGroup(cardSalidasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel35)
-                    .addComponent(jLabel7))
-                .addContainerGap(51, Short.MAX_VALUE))
+                .addComponent(jLabel7)
+                .addContainerGap(72, Short.MAX_VALUE))
+            .addComponent(lblSalidas, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jLabel35, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         cardSalidasLayout.setVerticalGroup(
             cardSalidasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -209,7 +220,7 @@ public class panelInventario extends javax.swing.JPanel {
                 .addGap(18, 18, 18)
                 .addComponent(jLabel35)
                 .addGap(18, 18, 18)
-                .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(lblSalidas, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 26, Short.MAX_VALUE)
                 .addComponent(jLabel7)
                 .addGap(14, 14, 14))
@@ -224,30 +235,26 @@ public class panelInventario extends javax.swing.JPanel {
 
         jLabel36.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         jLabel36.setForeground(new java.awt.Color(0, 0, 0));
+        jLabel36.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel36.setText("Productos");
 
-        jLabel8.setFont(new java.awt.Font("Segoe UI", 1, 36)); // NOI18N
-        jLabel8.setForeground(new java.awt.Color(0, 0, 0));
-        jLabel8.setText("350");
+        lblProductos.setFont(new java.awt.Font("Segoe UI", 1, 36)); // NOI18N
+        lblProductos.setForeground(new java.awt.Color(0, 0, 0));
+        lblProductos.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblProductos.setText("350");
 
         jLabel9.setFont(new java.awt.Font("Segoe UI", 0, 13)); // NOI18N
         jLabel9.setForeground(new java.awt.Color(0, 0, 0));
+        jLabel9.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel9.setText("Registrados");
 
         javax.swing.GroupLayout cardProductosLayout = new javax.swing.GroupLayout(cardProductos);
         cardProductos.setLayout(cardProductosLayout);
         cardProductosLayout.setHorizontalGroup(
             cardProductosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(cardProductosLayout.createSequentialGroup()
-                .addGap(42, 42, 42)
-                .addComponent(jLabel36)
-                .addContainerGap(57, Short.MAX_VALUE))
-            .addGroup(cardProductosLayout.createSequentialGroup()
-                .addGap(0, 0, Short.MAX_VALUE)
-                .addGroup(cardProductosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel9)
-                    .addComponent(jLabel8, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addComponent(lblProductos, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jLabel36, javax.swing.GroupLayout.DEFAULT_SIZE, 186, Short.MAX_VALUE)
+            .addComponent(jLabel9, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         cardProductosLayout.setVerticalGroup(
             cardProductosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -255,7 +262,7 @@ public class panelInventario extends javax.swing.JPanel {
                 .addGap(18, 18, 18)
                 .addComponent(jLabel36)
                 .addGap(18, 18, 18)
-                .addComponent(jLabel8, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(lblProductos, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 26, Short.MAX_VALUE)
                 .addComponent(jLabel9)
                 .addGap(14, 14, 14))
@@ -263,10 +270,6 @@ public class panelInventario extends javax.swing.JPanel {
 
         panelMovimientos.setBackground(new java.awt.Color(255, 255, 255));
         panelMovimientos.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(229, 231, 235)));
-
-        jLabel14.setFont(new java.awt.Font("Segoe UI Emoji", 1, 18)); // NOI18N
-        jLabel14.setForeground(new java.awt.Color(0, 0, 0));
-        jLabel14.setText("Movimientos Recientes");
 
         tablaMovimientos.setBackground(new java.awt.Color(255, 255, 255));
         tablaMovimientos.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(153, 153, 153)));
@@ -278,11 +281,11 @@ public class panelInventario extends javax.swing.JPanel {
                 {null, null, null, null, null}
             },
             new String [] {
-                "Fecha", "Tipo", "Producto", "Cantidad", "Usuario"
+                "Codigo", "Producto", "Categoria", "Stock", "Estado"
             }
         ) {
             boolean[] canEdit = new boolean [] {
-                false, false, false, false, true
+                false, false, false, false, false
             };
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {
@@ -299,6 +302,19 @@ public class panelInventario extends javax.swing.JPanel {
             tablaMovimientos.getColumnModel().getColumn(4).setResizable(false);
         }
 
+        btnEntradaInventario.setBackground(new java.awt.Color(0, 0, 0));
+        btnEntradaInventario.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        btnEntradaInventario.setForeground(new java.awt.Color(179, 227, 4));
+        btnEntradaInventario.setText("Entrada de Stock");
+        btnEntradaInventario.setAlignmentX(780.0F);
+        btnEntradaInventario.setAlignmentY(35.0F);
+        btnEntradaInventario.setPreferredSize(new java.awt.Dimension(160, 40));
+        btnEntradaInventario.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnEntradaInventarioActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout panelMovimientosLayout = new javax.swing.GroupLayout(panelMovimientos);
         panelMovimientos.setLayout(panelMovimientosLayout);
         panelMovimientosLayout.setHorizontalGroup(
@@ -306,15 +322,15 @@ public class panelInventario extends javax.swing.JPanel {
             .addGroup(panelMovimientosLayout.createSequentialGroup()
                 .addGap(16, 16, 16)
                 .addGroup(panelMovimientosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel14)
+                    .addComponent(btnEntradaInventario, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 875, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(21, Short.MAX_VALUE))
         );
         panelMovimientosLayout.setVerticalGroup(
             panelMovimientosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panelMovimientosLayout.createSequentialGroup()
-                .addGap(16, 16, 16)
-                .addComponent(jLabel14, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap()
+                .addComponent(btnEntradaInventario, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 225, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(21, Short.MAX_VALUE))
@@ -377,29 +393,138 @@ public class panelInventario extends javax.swing.JPanel {
         );
     }// </editor-fold>//GEN-END:initComponents
 
+    private void btnActualizarInventarioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnActualizarInventarioActionPerformed
+        cargarTabla();
+    }//GEN-LAST:event_btnActualizarInventarioActionPerformed
+
+    private void btnEntradaInventarioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEntradaInventarioActionPerformed
+        mostrarDialogoEntradaStock();
+    }//GEN-LAST:event_btnEntradaInventarioActionPerformed
+
+    //METODO CARGAR TABLA
+    private void cargarTabla() {
+
+        DefaultTableModel modelo = (DefaultTableModel) tablaMovimientos.getModel();
+
+        modelo.setRowCount(0);
+
+        Nodo<Producto> temp = controlProducto.getProductos().getCabeza();
+
+        int stockTotal = 0;
+        int totalProductos = 0;
+
+        while (temp != null) {
+
+            Producto p = temp.getDato();
+
+            String estado;
+
+            if (p.getStock() <= 5) {
+                estado = "Stock Bajo";
+            } else {
+                estado = "Disponible";
+            }
+
+            modelo.addRow(new Object[]{
+                p.getCodigo(),
+                p.getNombre(),
+                p.getCategoria(),
+                p.getStock(),
+                estado
+            });
+
+            stockTotal += p.getStock();
+            totalProductos++;
+
+            temp = temp.getSiguiente();
+        }
+
+        lblStockTotal.setText(String.valueOf(stockTotal));
+        lblProductos.setText(String.valueOf(totalProductos));
+        lblEntradas.setText(String.valueOf(DatosSistema.totalEntradas));
+        lblSalidas.setText(String.valueOf(DatosSistema.totalSalidas));
+        
+    }
+
+    //FORMULARIO ENTRADA DE STOCK
+    private void mostrarDialogoEntradaStock() {
+
+        JComboBox<Producto> cmbProductos = new JComboBox<>();
+
+        Nodo<Producto> temp = controlProducto.getProductos().getCabeza();
+
+        while (temp != null) {
+
+            cmbProductos.addItem(temp.getDato());
+
+            temp = temp.getSiguiente();
+        }
+
+        JTextField txtCantidad = new JTextField();
+
+        Object[] campos = {
+            "Producto:", cmbProductos,
+            "Cantidad a ingresar:", txtCantidad
+        };
+
+        int r = JOptionPane.showConfirmDialog(
+                this,
+                campos,
+                "Entrada de Stock",
+                JOptionPane.OK_CANCEL_OPTION
+        );
+
+        if (r == JOptionPane.OK_OPTION) {
+
+            try {
+
+                Producto producto = (Producto) cmbProductos.getSelectedItem();
+
+                int cantidad = Integer.parseInt(txtCantidad.getText());
+
+                producto.setStock(producto.getStock() + cantidad);
+                
+                DatosSistema.totalEntradas += cantidad;
+
+                cargarTabla();
+
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Stock actualizado correctamente."
+                );
+
+            } catch (NumberFormatException ex) {
+
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Ingrese una cantidad válida."
+                );
+            }
+        }
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnActualizarInventario;
+    private javax.swing.JButton btnEntradaInventario;
     private javax.swing.JPanel cardEntradas;
     private javax.swing.JPanel cardProductos;
     private javax.swing.JPanel cardSalidas;
     private javax.swing.JPanel cardStock;
     private javax.swing.JLabel jLabel13;
-    private javax.swing.JLabel jLabel14;
-    private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel33;
     private javax.swing.JLabel jLabel34;
     private javax.swing.JLabel jLabel35;
     private javax.swing.JLabel jLabel36;
-    private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
-    private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
-    private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JLabel lblEntradas;
     private javax.swing.JLabel lblInventario;
+    private javax.swing.JLabel lblProductos;
+    private javax.swing.JLabel lblSalidas;
+    private javax.swing.JLabel lblStockTotal;
     private javax.swing.JLabel lblSubtitulo3;
     private javax.swing.JPanel panelMovimientos;
     private javax.swing.JTable tablaMovimientos;
